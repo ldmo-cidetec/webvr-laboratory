@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robotic systems laboratory</title>
+    <link rel="shortcut icon" href="#">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script type="importmap">
+      {
+      "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@v0.166.1/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.166.1/examples/jsm/"
+      }
+      }
+  </script>
+</head>
+
+<body class="bg-gray-100 h-screen overflow-hidden">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-gray-700 shadow-lg p-4 flex justify-between items-center">
+        <h1 class="text-xl text-gray-100">Dynamic systems laboratory</h1>
+        <div class="flex items-center space-x-4">
+            <button id="setup-open-button" class="text-gray-300 hover:text-gray-100 focus:outline-none"
+                aria-label="Open menu">
+                <!-- Settings icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.591 1.066c1.543-.89 3.31.877 2.42 2.42a1.724 1.724 0 001.065 2.592c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.065 2.591c.89 1.543-.877 3.31-2.42 2.42a1.724 1.724 0 00-2.592 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.591-1.065c-1.543.89-3.31-.877-2.42-2.42a1.724 1.724 0 00-1.066-2.592c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.591c-.89-1.543.877-3.31 2.42-2.42.89.89 2.158-.177 2.591-1.066z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- AR Button -->
+    <button id="ar-button" class="fixed bottom-20 left-6 z-30 bg-gray-700 text-white w-12 h-12 rounded-full shadow-lg 
+           flex items-center justify-center hover:bg-gray-900 transition">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+            <text x="12" y="17" font-size="13" font-family="Arial" font-weight="bold" fill="currentColor"
+                text-anchor="middle">
+                AR
+            </text>
+        </svg>
+    </button>
+
+
+    <!-- Help Button -->
+    <button id="help-open-button"
+        class="fixed z-30 bottom-6 left-6 bg-gray-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-900 transition">
+        <!-- Help Icon -->
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M12 14a4 4 0 1 0-4-4" />
+            <circle cx="12" cy="12" r="10"></circle>
+        </svg>
+    </button>
+
+    <!-- Main Container -->
+    <div class="flex-grow h-full flex items-center justify-center bg-white">
+        <div id="scene-container" class="w-full h-full relative"></div>
+    </div>
+
+    <!-- Setup Panel -->
+    <div id="setup-panel" class="fixed top-0 right-0 h-full w-full sm:w-2/3 md:w-1/2 lg:w-1/3 xl:w-1/4 
+           bg-white shadow-xl z-40 overflow-y-auto
+           transform translate-x-full transition-transform duration-300">
+        <button id="setup-close-button"
+            class="text-3xl absolute top-4 right-4 text-gray-500 hover:text-gray-700">&times;</button>
+
+
+        <div class="p-6">
+            <h2 id="setup-title" class="text-gray-800 font-semibold text-2xl mb-4">Simulation setup</h2>
+
+            <div id="setup-topics" class="space-y-4">
+                <!-- Simple pendulum -->
+                <div class="setup-topic border border-gray-200 rounded-lg">
+                    <button class="setup-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        Simple pendulum simulation
+                    </button>
+                    <div class="setup-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+                        <!-- Simple Pendulum - Initial Conditions -->
+                        <div class="mb-4">
+                            <h3 class="text-gray-700 text-sm font-bold mb-2">
+                                Initial conditions
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4 mt-1">
+                                <div name="sp-initial-conditions">
+                                    <label for="sp-pendulum-position"
+                                        class="block text-sm font-medium text-gray-700">Pendulum
+                                        position</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="sp-pendulum-position" name="sp-pendulum-position"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0" step="5">
+                                        <span class="text-gray-500 ml-2">
+                                            deg
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="sp-pendulum-speed"
+                                        class="block text-sm font-medium text-gray-700">Pendulum
+                                        speed</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="sp-pendulum-speed" name="sp-pendulum-speed"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0" step="5">
+                                        <span class="text-gray-500 ml-2">
+                                            deg/s
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Simple Pendulum - Regulation task -->
+                        <div class="mb-4">
+                            <h3 class="text-gray-700 text-sm font-bold mb-2">
+                                Position regulation task
+                            </h3>
+
+                            <div class="grid grid-cols-1 gap-4 mt-1">
+                                <div>
+                                    <label for="sp-desired-pendulum-position"
+                                        class="block text-sm font-medium text-gray-700">Desired pendulum
+                                        position</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="sp-desired-pendulum-position"
+                                            name="sp-desired-pendulum-position"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="180" step="5">
+                                        <span class="text-gray-500 ml-2">
+                                            deg
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Simple Pendulum - PID Gains -->
+                        <div class="mb-6">
+                            <h3 class="text-gray-700 text-sm font-bold mb-2">
+                                PID controller gains
+                            </h3>
+                            <div class="grid grid-cols-3 gap-4 mt-1">
+                                <div>
+                                    <label for="sp-pendulum-kp"
+                                        class="block text-sm font-medium text-gray-700">Kp</label>
+                                    <input type="number" id="sp-pendulum-kp" name="sp-pendulum-kp"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="0.25" step="0.01" min="0" max="5">
+                                </div>
+                                <div>
+                                    <label for="sp-pendulum-ki"
+                                        class="block text-sm font-medium text-gray-700">Ki</label>
+                                    <input type="number" id="sp-pendulum-ki" name="sp-pendulum-ki"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="0.10" step="0.01" min="0" max="5">
+                                </div>
+                                <div>
+                                    <label for="sp-pendulum-kd"
+                                        class="block text-sm font-medium text-gray-700">Kd</label>
+                                    <input type="number" id="sp-pendulum-kd" name="sp-pendulum-kd"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="0.05" step="0.01" min="0" max="5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inverted pendulum -->
+                <div class="setup-topic border border-gray-200 rounded-lg">
+                    <button class="setup-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        Inverted pendulum simulation
+                    </button>
+                    <div class="setup-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+                        <!-- Inverted Pendulum - Initial Conditions -->
+                        <div class="mb-4">
+                            <h3 class="text-gray-700 text-sm font-bold mb-2">
+                                Initial conditions
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-4 mt-1">
+                                <div>
+                                    <label for="ip-cart-position" class="block text-sm font-medium text-gray-700">Cart
+                                        position</label>
+                                    <div class="flex items-center">
+                                        <input type="number" id="ip-cart-position" name="ip-cart-position"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0" step="0.005" min="-0.205" max="0.195">
+                                        <span class="text-gray-500 ml-2">
+                                            m
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="ip-cart-speed" class="block text-sm font-medium text-gray-700">Cart
+                                        speed</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="ip-cart-speed" name="ip-cart-speed"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0" step="0.005" min="-0.205" max="0.195">
+                                        <span class="text-gray-500 ml-2">
+                                            m/s
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="ip-pendulum-position"
+                                        class="block text-sm font-medium text-gray-700">Pendulum
+                                        position</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="ip-pendulum-position" name="ip-pendulum-position"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0" step="5">
+                                        <span class="text-gray-500 ml-2">
+                                            deg
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="ip-pendulum-speed"
+                                        class="block text-sm font-medium text-gray-700">Pendulum
+                                        speed</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="ip-pendulum-speed" name="ip-pendulum-speed"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0" step="5">
+                                        <span class="text-gray-500 ml-2">
+                                            deg/s
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Inverted Pendulum - Regulation task -->
+                        <div class="mb-4">
+                            <h3 class="text-gray-700 text-sm font-bold mb-2">
+                                Position regulation task
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-4 mt-1">
+                                <div>
+                                    <label for="ip-desired-cart-position"
+                                        class="block text-sm font-medium text-gray-700">Desired cart
+                                        position</label>
+                                    <div class="flex items-center">
+                                        <input type="number" id="ip-desired-cart-position"
+                                            name="ip-desired-cart-position"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0" step="0.005" min="-0.205" max="0.195">
+                                        <span class="text-gray-500 ml-2">
+                                            m
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="ip-desired-pendulum-position"
+                                        class="block text-sm font-medium text-gray-700">Desired pendulum
+                                        position</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="ip-desired-pendulum-position"
+                                            name="ip-desired-pendulum-position"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="180" step="5">
+                                        <span class="text-gray-500 ml-2">
+                                            deg
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inverted Pendulum - PID Gains -->
+                        <div class="mb-6">
+                            <h3 class="text-gray-700 text-sm font-bold mb-2">
+                                PID controller gains
+                            </h3>
+                            <div class="grid grid-cols-3 gap-4 mt-1">
+                                <div>
+                                    <label for="ip-cart-kp" class="block text-sm font-medium text-gray-700">Kp
+                                        (cart)</label>
+                                    <input type="number" id="ip-cart-kp" name="ip-cart-kp"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="0.75" step="0.01" min="0" max="5">
+                                </div>
+                                <div>
+                                    <label for="ip-cart-ki" class="block text-sm font-medium text-gray-700">Ki
+                                        (cart)</label>
+                                    <input type="number" id="ip-cart-ki" name="ip-cart-ki"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="0.05" step="0.01" min="0" max="5">
+                                </div>
+                                <div>
+                                    <label for="ip-cart-kd" class="block text-sm font-medium text-gray-700">Kd
+                                        (cart)</label>
+                                    <input type="number" id="ip-cart-kd" name="ip-cart-kd"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="1.00" step="0.01" min="0" max="5">
+                                </div>
+                                <div>
+                                    <label for="ip-pendulum-kp" class="block text-sm font-medium text-gray-700">Kp
+                                        (pendulum)</label>
+                                    <input type="number" id="ip-pendulum-kp" name="ip-pendulum-kp"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="0.25" step="0.01" min="0" max="5">
+                                </div>
+                                <div>
+                                    <label for="ip-pendulum-ki" class="block text-sm font-medium text-gray-700">Ki
+                                        (pendulum)</label>
+                                    <input type="number" id="ip-pendulum-ki" name="ip-pendulum-ki"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="0.10" step="0.01" min="0" max="5">
+                                </div>
+                                <div>
+                                    <label for="ip-pendulum-kd" class="block text-sm font-medium text-gray-700">Kd
+                                        (pendulum)</label>
+                                    <input type="number" id="ip-pendulum-kd" name="ip-pendulum-kd"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="0.05" step="0.01" min="0" max="5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mass Spring Damper -->
+                <div class="setup-topic border border-gray-200 rounded-lg">
+                    <button class="setup-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        Mass-spring-damper simulation
+                    </button>
+                    <div class="setup-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+                        <!-- Mass Spring Damper - Initial Conditions -->
+                        <div class="mb-4">
+                            <h3 class="text-gray-700 text-sm font-bold mb-2">
+                                Initial conditions
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4 mt-1">
+                                <div name="msd-initial-conditions">
+                                    <label for="msd-mass-position" class="block text-sm font-medium text-gray-700">Mass
+                                        position</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="msd-mass-position" name="msd-mass-position"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0.25" step="0.005" min="0.03" max="0.47">
+                                        <span class="text-gray-500 ml-2">
+                                            m
+                                        </span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="msd-mass-speed" class="block text-sm font-medium text-gray-700">Mass
+                                        speed</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="msd-mass-speed" name="msd-mass-speed"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0.25" step="0.005" min="0.03" max="0.47">
+                                        <span class="text-gray-500 ml-2">
+                                            m/s
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mass Spring Damper - Regulation task -->
+                        <div class="mb-4">
+                            <h3 class="text-gray-700 text-sm font-bold mb-2">
+                                Position regulation task
+                            </h3>
+
+                            <div class="grid grid-cols-1 gap-4 mt-1">
+                                <div>
+                                    <label for="msd-desired-mass-position"
+                                        class="block text-sm font-medium text-gray-700">Desired mass
+                                        position</label>
+
+                                    <div class="flex items-center">
+                                        <input type="number" id="msd-desired-mass-position"
+                                            name="msd-desired-mass-position"
+                                            class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                            value="0.3" step="0.005" min="0.03" max="0.47">
+                                        <span class="text-gray-500 ml-2">
+                                            m
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Mass Spring Damper - PID Gains -->
+                        <div class="mb-6">
+                            <h3 class="text-gray-700 text-sm font-bold mb-2">
+                                PID controller gains
+                            </h3>
+                            <div class="grid grid-cols-3 gap-4 mt-1">
+                                <div>
+                                    <label for="msd-mass-kp" class="block text-sm font-medium text-gray-700">Kp</label>
+                                    <input type="number" id="msd-mass-kp" name="msd-mass-kp"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="100.0" step="0.01" min="0" max="100">
+                                </div>
+                                <div>
+                                    <label for="msd-mass-ki" class="block text-sm font-medium text-gray-700">Ki</label>
+                                    <input type="number" id="msd-mass-ki" name="msd-mass-ki"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="50.0" step="0.01" min="0" max="100">
+                                </div>
+                                <div>
+                                    <label for="msd-mass-kd" class="block text-sm font-medium text-gray-700">Kd</label>
+                                    <input type="number" id="msd-mass-kd" name="msd-mass-kd"
+                                        class="mt-1 block w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value="25.0" step="0.01" min="0" max="100">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full flex justify-end">
+                <!-- Return Button -->
+                <button id="setup-back-button" class="hidden mt-4 px-4 py-2 bg-gray-700 text-white rounded-md shadow
+                   hover:bg-gray-900 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6l-6 6m0 0l6 6m-6-6h15" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <!-- Simulation Buttons -->
+                <button
+                    class="bg-blue-700 hover:bg-blue-900 text-white font-bold mt-4 py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    type="button" id="start-simulation">
+                    Start simulation
+                </button>
+                <button
+                    class="bg-red-700 hover:bg-red-900 text-white font-bold mt-4 py-2 px-4 rounded focus:outline-none focus:shadow-outline invisible"
+                    type="button" id="stop-simulation">
+                    Stop simulation
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Help Panel -->
+    <div id="help-panel" class="fixed top-0 left-0 h-full w-full sm:w-2/3 md:w-1/2 lg:w-1/3 xl:w-1/4 
+           bg-white shadow-xl z-40 overflow-y-auto
+           transform -translate-x-full transition-transform duration-300">
+
+        <button id="help-close-button" class="text-3xl absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+            &times;
+        </button>
+
+        <div class="p-6">
+            <h2 id="help-title" class="text-gray-800 font-semibold text-2xl mb-4">Help</h2>
+
+            <div id="help-topics" class="space-y-4">
+
+                <!-- Dynamic system -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        What is a dynamic system?
+                    </button>
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+                        A dynamic system is any system whose state changes over time following
+                        physical or mathematical laws. It allows us to describe how a phenomenon evolves,
+                        such as the motion of a pendulum or the vibration of a mass attached to a spring.
+                    </div>
+                </div>
+
+                <!-- Regulation task -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        What is a regulation task?
+                    </button>
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+                        A regulation task aims to keep a system variable, for example a position, velocity,
+                        or angle, at a desired value. The objective is for the system to reach that value
+                        and remain stable even when disturbances or changes in the environment occur.
+                    </div>
+                </div>
+
+                <!-- Controller -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        What is a controller?
+                    </button>
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+                        A controller is a mechanism that decides what action to apply to a system so that
+                        it behaves as desired. It compares what is currently happening with the desired outcome
+                        and applies a corrective action to reduce the difference.
+                    </div>
+                </div>
+
+                <!-- PID -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        What is a PID controller?
+                    </button>
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+                        A PID controller combines three actions to correct the behavior of the system:
+                        <br><br>
+                        <strong>P</strong> responds to the current error, <br>
+                        <strong>I</strong> corrects accumulated errors over time, and <br>
+                        <strong>D</strong> anticipates how the error will change. <br><br>
+                        Together, they enable precise, stable, and adaptable control in many situations.
+                    </div>
+                </div>
+
+                <!-- PID tuning -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        What is PID tuning?
+                    </button>
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+                        PID tuning consists of adjusting the Kp, Ki, and Kd gains so the system responds
+                        quickly, stably, and without excessive oscillations. A good tuning achieves a balance
+                        between speed, accuracy, and smoothness in the system response.
+                    </div>
+                </div>
+
+                <!-- Simple pendulum -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        What is a simple pendulum?
+                    </button>
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+
+                        <img src="./img/schematic_sp.svg" alt="Simple pendulum schematic"
+                            class="w-2/3 max-w-xs mx-auto mb-3">
+
+                        A simple pendulum consists of a mass suspended from a rod or string that oscillates
+                        under the action of gravity. It is a classic example of a nonlinear dynamic system
+                        and is commonly used to study oscillations, energy, and periodic behavior.
+                    </div>
+                </div>
+
+                <!-- Inverted pendulum -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        What is a fully-actuated inverted pendulum?
+                    </button>
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+
+                        <img src="./img/schematic_ip.svg" alt="Inverted pendulum schematic"
+                            class="w-2/3 max-w-xs mx-auto mb-3">
+
+                        A fully-actuated inverted pendulum is a system in which both the cart position
+                        and the pendulum angle are controlled. This allows maintaining the pendulum upright
+                        in a vertical equilibrium. It is a classic example of an unstable system that requires
+                        active control and is widely used in robotics and control theory.
+                    </div>
+                </div>
+
+                <!-- Mass-spring-damper -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        What is a mass-spring-damper system?
+                    </button>
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+
+                        <img src="./img/schematic_msd.svg" alt="Mass-spring-damper schematic"
+                            class="w-2/3 max-w-xs mx-auto mb-3">
+
+                        This system consists of a mass attached to a spring and a damper. It allows studying
+                        how a mechanical system responds to external forces, vibrations, and disturbances.
+                        Models like this are widely used in vehicle suspensions, robotics, and many practical
+                        mechanical systems.
+                    </div>
+                </div>
+
+                <!-- PID Tuning Tutorial -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        How to use this application to tune PID controllers?
+                    </button>
+
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+
+                        This application allows you to adjust a PID controller and observe in real time how it
+                        affects the behavior of each system. The process is:
+
+                        <ol class="list-decimal ml-5 mt-2 space-y-1">
+                            <li>Select one of the systems: simple pendulum, inverted pendulum,
+                                or mass-spring-damper.</li>
+
+                            <li>Configure the initial conditions of the system (position and velocity).</li>
+
+                            <li>Set the desired value you want the system to reach or maintain.</li>
+
+                            <li>Adjust the PID gains:
+                                <ul class="list-disc ml-5 mt-1">
+                                    <li><strong>Kp</strong>: corrects the current error.</li>
+                                    <li><strong>Ki</strong>: corrects accumulated errors.</li>
+                                    <li><strong>Kd</strong>: anticipates changes in the error.</li>
+                                </ul>
+                            </li>
+
+                            <li>Press <strong>Start simulation</strong> to visualize the system response.</li>
+
+                            <li>Modify Kp, Ki, and Kd as needed until achieving a stable response.</li>
+
+                            <li>Press <strong>Stop simulation</strong> to test new values.</li>
+                        </ol>
+
+                        <p class="mt-3">
+                            PID tuning is a gradual process: small changes in the gains can produce
+                            noticeable differences in behavior, helping you intuitively understand how
+                            a PID controller works.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Navigation tutorial -->
+                <div class="help-topic border border-gray-200 rounded-lg">
+                    <button class="help-topic-header w-full px-4 py-2 bg-gray-100 hover:bg-gray-200
+        text-left text-gray-800 font-semibold rounded-lg">
+                        How to navigate using the 3D viewer?
+                    </button>
+
+                    <div class="help-topic-content hidden px-4 py-3 text-gray-700 text-sm leading-relaxed">
+
+                        The 3D viewer of this laboratory uses <strong>OrbitControls</strong>, which allow you
+                        to explore the virtual scene easily. You can interact with the model as follows:
+
+                        <ul class="list-disc ml-5 mt-2 space-y-1">
+                            <li>
+                                <strong>Rotate the view:</strong> click and drag with the <em>left</em> mouse button
+                                (or hold one finger on a touch screen).
+                            </li>
+
+                            <li>
+                                <strong>Zoom in/out:</strong> use the mouse wheel
+                                (or pinch with two fingers on a touch screen).
+                            </li>
+
+                            <li>
+                                <strong>Pan/Move the camera:</strong> click and drag with the
+                                <em>right</em> mouse button
+                                (or drag with two fingers on a touch screen).
+                            </li>
+
+                            <li>
+                                <strong>Reset the view:</strong> double-click anywhere in the scene.
+                            </li>
+                        </ul>
+
+                        <p class="mt-3">
+                            These actions let you inspect the system from any angle and distance,
+                            making it easier to understand how the simulated dynamics evolve.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="w-full flex justify-end">
+                <!-- Return button -->
+                <button id="help-back-button" class="hidden mt-4 px-4 py-2 bg-gray-700 text-white rounded-md shadow
+                   hover:bg-gray-900 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6l-6 6m0 0l6 6m-6-6h15" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div id="welcome-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+
+        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-gray-700">
+
+            <!-- Title -->
+            <h2 class="text-xl font-bold mb-3 text-center">
+                Welcome to the dynamic systems laboratory
+            </h2>
+
+            <!-- General message -->
+            <p class="text-sm leading-relaxed text-center">
+                This virtual laboratory allows you to explore different dynamic systems and adjust
+                their PID controllers in real time for the regulation task. You can modify initial conditions, goals,
+                tune controllers,
+                and observe how each change affects the system response.
+            </p>
+
+            <p class="text-sm leading-relaxed text-center mt-2">
+                Before you begin, here is a quick guide to the main interface elements:
+            </p>
+
+            <!-- Icons section -->
+            <div class="space-y-4 mt-4">
+
+                <!-- Settings icon -->
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-gray-800 text-white rounded-md">
+                        <!-- Gear Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.591 1.066c1.543-.89 3.31.877 2.42 2.42a1.724 1.724 0 001.065 2.592c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.065 2.591c.89 1.543-.877 3.31-2.42 2.42a1.724 1.724 0 00-2.592 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.591-1.065c-1.543.89-3.31-.877-2.42-2.42a1.724 1.724 0 00-1.066-2.592c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.591c-.89-1.543.877-3.31 2.42-2.42.89.89 2.158-.177 2.591-1.066z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+
+                    <p class="text-sm">
+                        <strong>Settings:</strong> Use the gear icon to open the configuration panel
+                        and adjust initial conditions, goals, and PID controller gains.
+                    </p>
+                </div>
+
+                <!-- Help icon -->
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-gray-800 text-white rounded-md">
+                        <!-- Help Icon -->
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M12 14a4 4 0 1 0-4-4" />
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                    </div>
+
+                    <p class="text-sm">
+                        <strong>Help:</strong> Tap the question mark icon to learn how to use the
+                        laboratory and understand each dynamic system and its controller.
+                    </p>
+                </div>
+
+                <!-- AR icon -->
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-gray-800 text-white rounded-md">
+                        <!-- AR Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <text x="12" y="17" font-size="13" font-family="Arial" font-weight="bold"
+                                fill="currentColor" text-anchor="middle">
+                                AR
+                            </text>
+                        </svg>
+                    </div>
+
+                    <p class="text-sm">
+                        <strong>AR mode:</strong> Use this button to visualize the laboratory in
+                        your real physical space. This feature requires a mobile device
+                        compatible with <strong>WebXR</strong> and may not be available on all browsers.
+                    </p>
+
+                </div>
+
+                <!-- Checkbox -->
+                <div class="flex items-center mt-4">
+                    <input id="welcome-dont-show-again" type="checkbox"
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="welcome-dont-show-again" class="ml-2 text-sm text-gray-600">
+                        Don't show this again
+                    </label>
+                </div>
+
+                <!-- Close button -->
+                <button id="welcome-modal-close"
+                    class="mt-5 w-full py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+                    Continue
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module" src="./js/main.js"></script>
+</body>
+
+</html>
